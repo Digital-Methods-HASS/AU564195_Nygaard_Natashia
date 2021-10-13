@@ -1,0 +1,79 @@
+---
+title: "week 7 - practicing functions with gapminder"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+library(gapminder)
+library(tidyverse)
+```
+##1.
+
+Creating a defensive function that starts out by testing whether the arguments given to the function is numeric (year) or character (land), and gives an errormessage if it is not. If the criteria is met the function runs and I use filter to specify which country and year I want to match with the arguments. 
+
+```{r}
+calcGDP <- function(land, aar){
+  if(!is.numeric(aar)){
+    stop("aar must be numeric")
+  }
+  if(!is.character(land)){
+    stop("land must be character")
+  }
+    gdp <- gapminder %>% 
+      filter(country == land) %>% 
+      filter(year == aar)
+    
+    gdp_result <- gdp$gdpPercap * gdp$pop
+    
+    return(gdp_result)
+}
+```
+
+Finally feeding the function the desired arguments, the function calculates the GDP for country in the given years:
+
+```{r}
+calcGDP("Denmark",1967)
+calcGDP("Denmark",1977)
+calcGDP("Denmark",1987)
+calcGDP("Denmark",1997)
+calcGDP("Denmark",2007)
+calcGDP("Denmark",2017)
+```
+2017 is not part of the dataset, which is why it doesn't give a result. 
+
+##2 
+
+I first define what lower and upper threshold should be. Then I find the countries starting with B, using the function grep on the column country in the dataset gapminder. 
+
+After this I use a for-loop to iterate over the countries starting with B, using mean to find the mean of life expectancy for each country. Finally I use three if-statements to define what I want printed if they live up to the given criteria. 
+
+```{r}
+
+lowerThreshold <- 50
+upperThreshold <- 70
+
+countriesWithB <- grep("^B", unique(gapminder$country), value = TRUE)
+
+for (iCountry in countriesWithB){
+    tmp <- mean(subset(gapminder, country==iCountry)$lifeExp)
+
+    if(tmp < lowerThreshold){
+        cat("Average Life Expectancy in", iCountry, "is less than", lowerThreshold, "\n")
+    }else if(tmp > lowerThreshold && tmp < upperThreshold){
+        cat("Average Life Expectancy in", iCountry, "is between", lowerThreshold, "and", upperThreshold, "\n")
+    } else{
+        cat("Average Life Expectancy in", iCountry, "is greater than", upperThreshold, "\n")
+    }
+    rm(tmp)
+}
+
+        
+```
+
+
+
