@@ -1,0 +1,117 @@
+---
+title: "W1 - Interactive map in Leaflet"
+author: "Natashia Maise Nygaard"
+date: 'created on 01 February 2022 and updated `r format(Sys.time(), "%d %B, %Y")`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 1
+Describe a problem or question in your field that lends itself to spatial analysis.
+
+
+In general my field is concerned with how people interact with technologies - for example we, at one point looked into Google Maps and how it may be manipulated, by one user carrying several devices through the highway, feeding maps with data saying there was a lot of traffic at the specific point. However, these data were manipulated before put into the map and therefore somewhat spatial analysis for people to use for navigating when driving.  
+
+## Exercise 2
+List data layers that you think are necessary to answer your question/solve your problem. Describe examples of two or three of your listed layers and see if you can find them on the internet.
+
+
+
+## Exercise 3: Option 1
+Make a Map: Your colleague has found some ruins during a hike in the Blue Mountains and recorded the coordinates of structures on her phone (RCFeature2018.csv). She would like to map her points but has no computer or mapping skills. Can you make a map that she can work with using only a browser? She needs an interactive map that she can download to her computer and use straightaway.
+
+Firstly I install leaflet and htmlwidget
+```{r}
+install.packages("leaflet")
+install.packages("htmlwidget")
+```
+
+Then loading in the libraries
+```{r}
+library(leaflet)
+library(htmlwidgets)
+library(tidyverse)
+```
+
+Then I want to load the CSV into my working space 
+```{r}
+RecCor <- read.csv("RCFeature2018.csv")
+```
+
+
+
+### Exercise 3.1.
+Create a standalone .html map in Leaflet showing at least basic topography and relief, and load in the table of points. Make sure she can see the FeatureID, FeatureType and Description attributes when she hovers over the point markers. 
+
+```{r}
+l_BM <- leaflet() %>%   # assign the base location to an object
+  setView(149.7360299, -33.3481729, zoom = 13)
+```
+
+```{r}
+l_BM <- leaflet() %>%   # assign the base location to an object
+  setView(9.50178500000004, 56.26392, zoom = 13)
+
+esri <- grep("^Esri", providers, value = TRUE)
+
+for (provider in esri) {
+  l_BM <- l_BM %>% addProviderTiles(provider, group = provider)
+}
+
+BMmap <- l_BM %>%
+  addLayersControl(baseGroups = names(esri),
+                   options = layersControlOptions(collapsed = FALSE)) %>%
+  addMiniMap(tiles = esri[[1]], toggleDisplay = TRUE,
+             position = "bottomright") %>%
+  addMarkers(lng = RecCor$Longitude, 
+             lat = RecCor$Latitude,
+             popup = RecCor$Description) %>%
+  addMeasure(
+    position = "bottomleft",
+    primaryLengthUnit = "meters",
+    primaryAreaUnit = "sqmeters",
+    activeColor = "#3D535D",
+    completedColor = "#7D4479") %>% 
+  htmlwidgets::onRender("
+                        function(el, x) {
+                        var myMap = this;
+                        myMap.on('baselayerchange',
+                        function (e) {
+                        myMap.minimap.changeLayer(L.tileLayer.provider(e.name));
+                        })
+                        }") %>% 
+  addControl("", position = "topright")
+
+BMmap
+```
+
+
+### Exercise 3.2.
+Consider adding elements such as minimap() and measure() for easier map interaction
+
+### Exercise 3.3.
+Explore differentiating the markers (e.g. by size using Accuracy field)
+
+### Exercise 3.4.
+Explore the option of clustering markers with addMarkers(clusterOptions = markerClusterOptions()). Do you recommend marker clustering here?
+
+## Exercise 4: Option 2
+Make a Map: You wish to travel to Chicago for a study stay but wish to stay away from the most crime-ridden areas. You have a friend at Evanston, who invited you in. Is it safe to stay at her place? Make a map that allows both of you to explore the local situation. Use the ChicagoCrime.csv (attached here or on Github) to create an interactive map of murders in the city. Is a heatmap or clustered points better?
+
+### Exercise 4.1.
+Create a standalone .html map in Leaflet showing at least basic topography and relief, and load in the table of points. Make sure she can see the locations of crime and crime attributes when you hovers over the point markers. 
+
+### Exercise 4.2.
+Consider adding elements such as minimap() and measure() for easier map interaction
+
+### Exervise 4.3. 
+Can you create a heatmap of crime?
+
+### Exercise 4.4.
+Explore differentiating the markers (e.g. by color for different kinds of crime)
+
+### Exercise 4.5.
+Explore the option of clustering markers with addMarkers(clusterOptions = markerClusterOptions()). Do you recommend marker clustering here?
