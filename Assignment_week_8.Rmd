@@ -1,0 +1,61 @@
+---
+title: "Spatial Statistics - Introduction"
+author: "Adela Sobotkova"
+date: "11/12/2020 updated `r format(Sys.time(), '%B %d, %Y')`" 
+output:
+  rmdformats::readthedown:
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("spatstat")
+```
+```{r}
+library(spatstat)
+```
+
+# Task 7: Point Pattern testing
+
+Two `ppp` objects have been created called `p1` and `p2` in your /data folder. Test if they are clustered or regular, and select the right answer. You'll need to run `quadrat.test` four times, once for each process with each hypothesis.
+
+```{r}
+ppp1 <- readRDS("../data/p1.rds")
+ppp2 <- readRDS("../data/p2.rds")
+
+
+
+# Run a quadrat test
+quadrat.test(ppp1, alternative = "clustered")
+
+
+# Run a quadrat test
+quadrat.test(ppp1, alternative = "regular")
+
+
+# Run a quadrat test
+quadrat.test(ppp2, alternative = "clustered")
+
+
+# Run a quadrat test
+quadrat.test(ppp2, alternative = "regular")
+
+
+```
+
+
+# Task 3: Tree location pattern
+
+Load a `ppp` object called `redoak` which contains the locations of trees in a woodland. Plot the tree locations and then test the hypothesis that the points are clustered against a null hypothesis of a random uniform distribution.
+
+```{r, eval= FALSE}
+redoak <- readRDS("../data/redoak.rds")
+
+redoak_cluster_env <- envelope(redoak, correction = "border")
+
+plot(redoak_cluster_env, . - pi * r ^ 2 ~ r)
+
+```
